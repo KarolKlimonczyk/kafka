@@ -76,13 +76,18 @@ public class TwitterProducer {
         properties.setProperty(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE)); //Setting a value greater than zero will cause the client to resend any record whose send fails with a potentially transient error.
         properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5"); //The maximum number of unacknowledged requests the client will send on a single connection before blocking.
 
+        //high throughput producer
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy"); // compress to snappy
+        properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20"); //wait 20ms to increase chance to send more data in one batch (don't push batch immediately)
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32 * 1024)); // 32KB batch size
+
         return new KafkaProducer<>(properties);
     }
 
     private Client createTwitterClient(BlockingQueue<String> msgQueue) {
         var hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
         var hosebirdEndpoint = new StatusesFilterEndpoint();
-        var terms = Lists.newArrayList("bitcoin");
+        var terms = Lists.newArrayList("bitcoin", "java", "kafka", "javascript", "angular", "springboot", "jvm");
 
         hosebirdEndpoint.trackTerms(terms);
         var hosebirdAuth = new OAuth1(CONSUMER_KEY, CONSUMER_SECRET, TOKEN, SECRET);
