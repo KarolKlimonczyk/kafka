@@ -71,6 +71,11 @@ public class TwitterProducer {
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
+        properties.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true"); //ensure that exactly one copy of each message is written in the stream
+        properties.setProperty(ProducerConfig.ACKS_CONFIG, "all"); //The number of acknowledgments the producer requires the leader to have received before considering a request complete.
+        properties.setProperty(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE)); //Setting a value greater than zero will cause the client to resend any record whose send fails with a potentially transient error.
+        properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5"); //The maximum number of unacknowledged requests the client will send on a single connection before blocking.
+
         return new KafkaProducer<>(properties);
     }
 
